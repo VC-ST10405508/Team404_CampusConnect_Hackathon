@@ -19,6 +19,5 @@ namespace Team404_CampusConnect_Hackathon.Models
 
         public List<Skill> UserSkills { get; set; } = new();
         public List<Sport> UserSports { get; set; } = new();
-        public List<MaterialEntry> MaterialEntries { get; set; } = new();
     }
 }
