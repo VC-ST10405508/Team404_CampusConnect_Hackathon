@@ -18,6 +18,7 @@ This project was created as part of a hackathon, with the goal of rapidly develo
 - Entity Framework
 - SQlite
 - Render (for hosting)
+---
 ## Functional Requirements
 1. **Login / Sign-Up**: Users can create an account and log in securely.  
 2. **Profile Creation**: Users can customize their profiles with degree, skills, sports, profile photo, and other relevant information.  
