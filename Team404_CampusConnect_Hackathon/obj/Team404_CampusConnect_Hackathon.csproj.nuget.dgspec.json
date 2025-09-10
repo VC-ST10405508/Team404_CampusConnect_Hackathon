@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Joshua\\Source\\Repos\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon.csproj": {}
+    "C:\\Users\\Joshua\\source\\repos\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Joshua\\Source\\Repos\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon.csproj": {
+    "C:\\Users\\Joshua\\source\\repos\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Joshua\\Source\\Repos\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon.csproj",
+        "projectUniqueName": "C:\\Users\\Joshua\\source\\repos\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon.csproj",
         "projectName": "Team404_CampusConnect_Hackathon",
-        "projectPath": "C:\\Users\\Joshua\\Source\\Repos\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon.csproj",
+        "projectPath": "C:\\Users\\Joshua\\source\\repos\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon.csproj",
         "packagesPath": "C:\\Users\\Joshua\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\Joshua\\Source\\Repos\\Team404_CampusConnect_Hackathon\\Team404_CampusConnect_Hackathon\\obj\\",
         "projectStyle": "PackageReference",

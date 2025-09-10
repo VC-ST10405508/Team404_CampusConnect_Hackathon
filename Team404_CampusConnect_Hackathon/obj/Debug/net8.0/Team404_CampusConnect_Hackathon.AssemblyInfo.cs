@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Team404_CampusConnect_Hackathon")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+60cd2dd654cba85ab632d2358dbe5051b105555e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c0abccc04f594ba9460040401839b39bef8d8207")]
 [assembly: System.Reflection.AssemblyProductAttribute("Team404_CampusConnect_Hackathon")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Team404_CampusConnect_Hackathon")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

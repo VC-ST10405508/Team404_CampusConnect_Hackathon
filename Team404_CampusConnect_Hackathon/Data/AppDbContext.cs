@@ -27,21 +27,6 @@ namespace Team404_CampusConnect_Hackathon.Data
         public DbSet<Post> Posts { get; set; }
         public DbSet<StudyMaterial> StudyMaterials { get; set; }
         public DbSet<Comment> Comments { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            // Configure many-to-many for User Skills
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.UserSkills)
-                .WithMany(s => s.Users);
-
-            // Configure many-to-many for User Sports
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.UserSports)
-                .WithMany(s => s.Users);
-        }
     }
 }
 
