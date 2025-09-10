@@ -1,0 +1,25 @@
+﻿<h2>Create Event</h2>
+
+<form asp-action="CreateEvent" method="post">
+    <!--Inputs required for the post to work: -->
+    <input type="hidden" name="GroupID" value="@ViewBag.GroupID" />
+    <div class="mb-3">
+        <label class="form-label">Event Name</label>
+        <input type="text" class="form-control" id="Title" name="Title" placeholder="Enter group name" />
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="Description" name="Description" placeholder="Enter group description"></textarea>
+    </div>
+    <!--Dates for eventstart and joinenddate are here -->
+    <div class="mb-3">
+        <label class="form-label">Event Date</label>
+        <input type="date" class="form-control" name="EventDate" id="EventDate" required />
+    </div>
+ 
+    <div class="mb-3">
+        <label class="form-label">Join Deadline</label>
+        <input type="date" class="form-control" name="JoinDeadline" id="JoinDeadline" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Create Group</button>
+</form>

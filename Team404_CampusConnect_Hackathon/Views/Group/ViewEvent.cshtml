@@ -1,0 +1,72 @@
+﻿@model Team404_CampusConnect_Hackathon.Models.GroupEvent
+
+@{
+    ViewData["Title"] = "Event Details";
+    var isMember = ViewBag.IsMember != null && (bool)ViewBag.IsMember;
+    var hasRSVPed = ViewBag.HasRSVPed != null && (bool)ViewBag.HasRSVPed;
+}
+
+<div class="container my-5">
+    <div class="card shadow-lg rounded" style="background-color:#E9ECF5; border:none; padding:30px;">
+        <div class="card-body">
+            <h2 class="text-primary text-center mb-3">@Model.Title</h2>
+            <p class="text-center text-muted mb-4">@Model.Description</p>
+
+            <div class="row mb-3">
+                <div class="col-md-6 text-center">
+                    <strong>Event Date:</strong>
+                    <p>@Model.EventDate.ToString("MMMM dd, yyyy")</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <strong>Join Deadline:</strong>
+                    <p>@Model.JoinDeadline.ToString("MMMM dd, yyyy")</p>
+                </div>
+            </div>
+
+            @* RSVP / Leave button for group members *@
+            @if (isMember)
+            {
+                <form asp-action="ViewEvent" asp-controller="Group" method="post" class="text-center mb-3">
+                    <input type="hidden" name="EventID" value="@Model.EventID" />
+                    <input type="hidden" name="groupID" value="@Model.GroupID" />
+
+                    @if (hasRSVPed)
+                    {
+                        <button type="submit" name="Leave" value="true" class="btn btn-danger">
+                            Leave Event
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-success">RSVP to Event</button>
+                    }
+                </form>
+            }
+            else
+            {
+                <p class="text-center text-muted">Only group members can RSVP for this event.</p>
+            }
+
+            @* Display messages *@
+            @if (ViewBag.SuccessMsg != null)
+            {
+                <div class="alert alert-success mt-3 text-center">
+                    @ViewBag.SuccessMsg
+                </div>
+            }
+
+            @if (ViewBag.ErrorMsg != null)
+            {
+                <div class="alert alert-danger mt-3 text-center">
+                    @ViewBag.ErrorMsg
+                </div>
+            }
+
+            <div class="text-center mt-4">
+                <a asp-action="SpecificGroup" asp-controller="Group" asp-route-id="@Model.GroupID" class="btn btn-secondary">
+                    Back to Group
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

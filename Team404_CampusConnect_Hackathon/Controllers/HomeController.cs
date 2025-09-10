@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using Team404_CampusConnect_Hackathon.Interface;
 using Team404_CampusConnect_Hackathon.Models;
 
@@ -10,106 +10,124 @@ namespace Team404_CampusConnect_Hackathon.Controllers
         private readonly IRepository<Group> _group;
         private readonly IRepository<UserGroup> _userGroup;
         private readonly IRepository<User> _user;
+        private readonly IRepository<StudyMaterial> _studyMaterial;
+        private readonly ILogger<HomeController> _logger;
 
-
-        public HomeController(IRepository<Group> group, IRepository<UserGroup> userGroup, IRepository<User> user, IRepository<GroupChatMessage> groupMessages, IRepository<GroupAnnouncement> groupAnnouncements, IRepository<EventAttendee> eventAttendee, IRepository<GroupEvent> groupEvent, IGroupWithDetails groupDetails)
+        public HomeController(
+            IRepository<Group> group,
+            IRepository<UserGroup> userGroup,
+            IRepository<User> user,
+            IRepository<StudyMaterial> studyMaterial,
+            ILogger<HomeController> logger)
         {
             _group = group;
             _userGroup = userGroup;
             _user = user;
+            _studyMaterial = studyMaterial;
+            _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Index() => View();
+
+        public IActionResult Privacy() => View();
+
+        public async Task<IActionResult> Material()
         {
-            return View();
+            var materials = await _studyMaterial.GetAllAsync() ?? new List<StudyMaterial>();
+            return View(materials);
         }
 
-        public IActionResult Privacy()
+        public IActionResult CreateMaterial() => View();
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateMaterial(StudyMaterial material, IFormFile upload)
         {
-            return View();
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if (upload != null && upload.Length > 0)
+                    {
+                        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                        if (!Directory.Exists(uploadsFolder))
+                            Directory.CreateDirectory(uploadsFolder);
+
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(upload.FileName);
+                        var filePath = Path.Combine(uploadsFolder, fileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await upload.CopyToAsync(fileStream);
+                        }
+
+                        material.FilePath = "/uploads/" + fileName;
+                        material.FileType = Path.GetExtension(upload.FileName).ToLower();
+                    }
+
+                    await _studyMaterial.AddAsync(material);
+                    await _studyMaterial.SaveAsync();
+
+                    return RedirectToAction("Material");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while creating material");
+                ModelState.AddModelError("", "An error occurred while creating the material.");
+            }
+
+            return View(material);
         }
 
         public async Task<IActionResult> EditProfile()
         {
             var currentUserId = HttpContext.Session.GetString("uID");
-
-            Team404_CampusConnect_Hackathon.Models.User currentUser = null;
-            if (!string.IsNullOrEmpty(currentUserId))
-            {
-                var users = await _user.GetAllAsync();
-                currentUser = users.FirstOrDefault(u => u.UserID == currentUserId);
-            }
+            var currentUser = !string.IsNullOrEmpty(currentUserId)
+                ? (await _user.GetAllAsync()).FirstOrDefault(u => u.UserID == currentUserId)
+                : null;
 
             if (currentUser == null)
-            {
-                // Redirect to login or error page if user not found
                 return RedirectToAction("Login");
-            }
 
-            // Pass only the current user to the view
             return View(currentUser);
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProfile(User updatedUser)
         {
             if (ModelState.IsValid)
             {
-                // Get the existing user from DB
                 var user = await _user.GetByIdAsync(updatedUser.UserID);
-                if (user == null)
-                {
-                    return NotFound();
-                }
+                if (user == null) return NotFound();
 
-                // Update fields
                 user.UserName = updatedUser.UserName;
                 user.Email = updatedUser.Email;
-                user.UserSkills = updatedUser.UserSkills; // string like "C#, Java"
+                user.UserSkills = updatedUser.UserSkills;
                 user.Degree = updatedUser.Degree;
 
-                
-
-                // Save changes
-                await _user.UpdateAsync(user); // update tracked entity
-                await _user.SaveAsync();       // commit changes to DB
+                await _user.UpdateAsync(user);
+                await _user.SaveAsync();
 
                 return RedirectToAction("Profile", "Home");
             }
 
-            // If something fails, reload the form with data
             return View(updatedUser);
         }
 
-
-
-        // Add 'async' and return Task<IActionResult>
         public async Task<IActionResult> Profile()
         {
-            // Get the current user's ID from session
             var currentUserId = HttpContext.Session.GetString("uID");
-
-            Team404_CampusConnect_Hackathon.Models.User currentUser = null;
-
-            if (!string.IsNullOrEmpty(currentUserId))
-            {
-                // Get all users and find the one that matches the current user's ID
-                var users = await _user.GetAllAsync(); 
-                currentUser = users.FirstOrDefault(u => u.UserID == currentUserId);
-            }
+            var currentUser = !string.IsNullOrEmpty(currentUserId)
+                ? (await _user.GetAllAsync()).FirstOrDefault(u => u.UserID == currentUserId)
+                : null;
 
             if (currentUser == null)
-            {
-                // Optional: redirect to login if no current user is found
                 return RedirectToAction("Login");
-            }
 
-            // Pass only the current user to the view
             return View(currentUser);
         }
-
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

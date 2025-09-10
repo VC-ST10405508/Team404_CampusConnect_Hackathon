@@ -26,6 +26,7 @@ namespace Team404_CampusConnect_Hackathon.Data
         public DbSet<GroupAnnouncement> GroupAnnouncements { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<StudyMaterial> StudyMaterials { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

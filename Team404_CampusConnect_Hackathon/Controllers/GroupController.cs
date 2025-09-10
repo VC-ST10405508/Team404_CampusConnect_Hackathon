@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Team404_CampusConnect_Hackathon.Interface;
 using Team404_CampusConnect_Hackathon.Models;
@@ -70,13 +71,13 @@ namespace Team404_CampusConnect_Hackathon.Controllers
                 userGroup.Group = group;
                 userGroup.UserGroupID = "U" + Guid.NewGuid().ToString("N");
                 userGroup.Role = "Owner";
-                
+
                 //saving the information into the database
                 await _group.AddAsync(group);
                 await _group.SaveAsync();
                 await _userGroup.AddAsync(userGroup);
                 await _userGroup.SaveAsync();
-                
+
                 //success msg
                 ViewBag.SuccessMsg = "Group successfully created";
                 return View();
@@ -165,6 +166,260 @@ namespace Team404_CampusConnect_Hackathon.Controllers
         public IActionResult JoinGroup()
         {
             return View();
+        }
+
+        public async Task<IActionResult> SendMessage(string message, string groupID)
+        {
+            //making sure that visitors cannot force join a group
+            var userId = HttpContext.Session.GetString("uID");
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "Must be logged in to perform actions and view other pages. Please log in";
+                return RedirectToAction("Index", "Home");
+            }
+            //using a try catch to prevent program from crashing
+            try
+            {
+                //creating the new message
+                GroupChatMessage newMessage = new GroupChatMessage();
+                newMessage.MessageID = "M" + Guid.NewGuid().ToString("N");
+                newMessage.GroupID = groupID;
+                newMessage.UserID = userId;
+                newMessage.Content = message;
+
+                //saving the group message to the database
+                await _groupMessages.AddAsync(newMessage);
+                await _groupMessages.SaveAsync();
+
+                //returning the user back to the group page
+                return RedirectToAction("SpecificGroup", new { id = groupID });
+
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Must be logged in to perform actions and view other pages. Please log in";
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAnnouncement(string GroupID, string Title, string Content)
+        {
+            //making sure that visitors cannot force join a group
+            var userId = HttpContext.Session.GetString("uID");
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "Must be logged in to perform actions and view other pages. Please log in";
+                return RedirectToAction("Index", "Home");
+            }
+
+            //Getting the specific users group information so that we can check if they are a group member and if they are the owner:
+            var membership = (await _userGroup.GetAllAsync()).FirstOrDefault(ug => ug.GroupID == GroupID && ug.UserID == userId);
+            if (membership == null || membership.Role != "Owner")
+            {
+                TempData["Error"] = "Only group owners can post announcements.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            //creating the new announcements information
+            var newAnnouncement = new GroupAnnouncement
+            {
+                AnnouncementID = "A" + Guid.NewGuid().ToString("N"),
+                GroupID = GroupID,
+                Title = Title,
+                Content = Content,
+                DateCreated = DateTime.Now
+            };
+
+            //saving the new announcement to the database
+            await _groupAnnouncements.AddAsync(newAnnouncement);
+            await _groupAnnouncements.SaveAsync();
+
+            TempData["Success"] = "Announcement successfully added";
+            return RedirectToAction("SpecificGroup", new { id = GroupID });
+        }
+
+        public async Task<IActionResult> CreateEvent(string groupID)
+        {
+            //making sure user is logged in before accessing the page
+            var userId = HttpContext.Session.GetString("uID");
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "Must be logged in to perform actions and view other pages. Please log in";
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.GroupID = groupID;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateEvent(string groupID, string Title, string Description, DateTime EventDate, DateTime JoinDeadline)
+        {
+            // making sure that visitors cannot force join a group
+            var userId = HttpContext.Session.GetString("uID");
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "Must be logged in to perform actions and view other pages. Please log in";
+                return RedirectToAction("Index", "Home");
+            }
+
+            try
+            {
+                //Getting the specific users group information so that we can check if they are a group member and if they are the owner:
+                var membership = (await _userGroup.GetAllAsync()).FirstOrDefault(ug => ug.GroupID == groupID && ug.UserID == userId);
+                if (membership == null || membership.Role != "Owner")
+                {
+                    //returning them to home page if they arent cause only owner can create event
+                    TempData["Error"] = "Only group owners can make the events for the group.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                //making sure the system is able to identify which group made the request - this is set when the page loads through ViewBag
+                if (string.IsNullOrEmpty(groupID))
+                {
+                    //returning them to home page if they arent cause only owner can create event
+                    TempData["Error"] = "Unable to identify group request is made from. Please contact support if you think this is a mistake";
+                    return RedirectToAction("Index", "Home");
+                }
+                if (EventDate == null || JoinDeadline == null)
+                {
+                    TempData["Error"] = "Dates didnt set properly";
+                    return RedirectToAction("Index", "Home");
+                }
+                //creating the group event entry to save to the database
+                GroupEvent groupEvent = new GroupEvent();
+                groupEvent.GroupID = groupID;
+                groupEvent.EventID = "E" + Guid.NewGuid().ToString("N");
+                groupEvent.Title = Title;
+                groupEvent.Description = Description;
+                groupEvent.JoinDeadline = JoinDeadline;
+                groupEvent.EventDate = EventDate;
+
+                //saving to the db
+                await _groupEvent.AddAsync(groupEvent);
+                await _groupEvent.SaveAsync();
+
+                //returnign the group with a success smg to inform user it was successful
+                TempData["Success"] = "Announcement successfully added";
+                return RedirectToAction("SpecificGroup", new { id = groupID });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Unexpected error occured: " + ex.Message;
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        //A method to display the current event that the user is trying to view
+        public async Task<IActionResult> ViewEvent(string id)
+        {
+            //making sure user is logged in before they can view the page
+            var userId = HttpContext.Session.GetString("uID");
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "Must be logged in to perform actions and view other pages. Please log in";
+                return RedirectToAction("Index", "Home");
+            }
+            //making sure the group does indeed exist and that the function recieved a legitmate request
+            var evt = await _groupEvent.GetByIdAsync(id);
+            if (evt == null)
+            {
+                TempData["Error"] = "Unable to identify group event";
+                return RedirectToAction("Index", "Home");
+            }
+            try
+            {
+                // Check if user is a member of the group
+                var membership = (await _userGroup.GetAllAsync())
+                    .FirstOrDefault(ug => ug.GroupID == evt.GroupID && ug.UserID == userId);
+                ViewBag.IsMember = membership != null;
+                // Check if user already RSVPed
+                var attendee = (await _eventAttendee.GetAllAsync()).FirstOrDefault(a => a.EventID == id && a.UserID == userId);
+                if (attendee == null)
+                {
+                    return View(evt);
+                }
+                ViewBag.HasRSVPed = attendee != null;
+                //Returning the event to the model so that we can work with it directly :
+                return View(evt);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An unexpected error occured" + ex.Message;
+                return RedirectToAction("Index", "Home");
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> ViewEvent(string EventID, string groupID, string Leave)
+        {
+            var userId = HttpContext.Session.GetString("uID");
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "Must be logged in to perform actions and view other pages. Please log in";
+                return RedirectToAction("Index", "Home");
+            }
+
+            try
+            {
+                //making sure the user is a membmer
+                var membership = (await _userGroup.GetAllAsync())
+                    .FirstOrDefault(ug => ug.GroupID == groupID && ug.UserID == userId);
+                if (membership == null)
+                {
+                    TempData["Error"] = "Only group members can RSVP for this event.";
+                    return RedirectToAction("Index", "Home");
+                }
+                //settting the member
+                ViewBag.IsMember = membership != null;
+                //checking if the user already RSVPed
+                var existingRSVP = (await _eventAttendee.GetAllAsync())
+                    .FirstOrDefault(ea => ea.EventID == EventID && ea.UserID == userId);
+
+
+                if (!string.IsNullOrEmpty(Leave))
+                {
+                    // Leave Event
+                    if (existingRSVP != null)
+                    {
+                        await _eventAttendee.DeleteAsync(existingRSVP.EventAttendeeID);
+                        await _eventAttendee.SaveAsync();
+                        ViewBag.SuccessMsg = "You have left the event.";
+                    }
+                }
+                else
+                {
+                    //adding the rsvp
+                    if (existingRSVP == null)
+                    {
+                        var attendee = new EventAttendee
+                        {
+                            EventAttendeeID = "RSVPn" + Guid.NewGuid().ToString("N"),
+                            EventID = EventID,
+                            UserID = userId
+                        };
+                        await _eventAttendee.AddAsync(attendee);
+                        await _eventAttendee.SaveAsync();
+                        ViewBag.SuccessMsg = "Successfully joined the event.";
+                    }
+                    else
+                    {
+                        ViewBag.ErrorMsg = "You have already joined this event.";
+                    }
+                }
+
+                // Update the flag for the view
+                ViewBag.HasRSVPed = !string.IsNullOrEmpty(Leave) ? false : true;
+
+                var evt = await _groupEvent.GetByIdAsync(EventID);
+                return View(evt);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMsg = "Unexpected error occurred: " + ex.Message;
+                var evt = await _groupEvent.GetByIdAsync(EventID);
+                return View(evt);
+            }
         }
     }
 }

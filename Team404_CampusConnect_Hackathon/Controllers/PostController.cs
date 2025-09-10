@@ -9,12 +9,14 @@ namespace Team404_CampusConnect_Hackathon.Controllers
     {
         private readonly IRepository<User> _userInterface;
         private readonly IRepository<Post> _postInterface;
+        private readonly IRepository<Comment> _commentInterface;
         private readonly ILogger<PostController> _logger;
 
-        public PostController(IRepository<User> userInterface, IRepository<Post> postInterface, ILogger<PostController> logger)
+        public PostController(IRepository<User> userInterface, IRepository<Post> postInterface, IRepository<Comment> commentInterface, ILogger<PostController> logger)
         {
             _userInterface = userInterface;
             _postInterface = postInterface;
+            _commentInterface = commentInterface;
             _logger = logger;
         }
 
@@ -29,7 +31,7 @@ namespace Team404_CampusConnect_Hackathon.Controllers
             {
                 //returning user to home page with error if they try to access a page without loggin in
                 TempData["Error"] = "Must be logged in to see posts. Please Login before trying to access other pages";
-                return RedirectToAction("Index", "Home"); 
+                return RedirectToAction("Index", "Home");
             }
             return View();
         }
@@ -39,12 +41,23 @@ namespace Team404_CampusConnect_Hackathon.Controllers
             var user = HttpContext.Session.GetString("uID");
             if (string.IsNullOrEmpty(user))
             {
-                //returning user to home page with error if they try to access a page without loggin in
                 TempData["Error"] = "Must be logged in to see posts. Please Login before trying to access other pages";
                 return RedirectToAction("Index", "Home");
             }
+
             var posts = await _postInterface.GetAllAsync();
-            return View(posts);
+
+            // Fetch all comments
+            var comments = await _commentInterface.GetAllAsync();
+
+            // Pass both to the view using a ViewModel
+            var viewModel = posts.Select(p => new PostWithCommentsViewModel
+            {
+                Post = p,
+                Comments = comments.Where(c => c.PostID == p.PostID).OrderByDescending(c => c.DateCreated).ToList()
+            }).ToList();
+
+            return View(viewModel);
         }
         [HttpPost]
         public async Task<IActionResult> NewPost(string title, string content, string category)
@@ -79,5 +92,42 @@ namespace Team404_CampusConnect_Hackathon.Controllers
             ViewBag.Error = "An error has occured well trying to save your post";
             return View();
         }
+        [HttpPost]
+        public async Task<IActionResult> Add(string postId, string content)
+        {
+            var user = HttpContext.Session.GetString("uID");
+            var username = HttpContext.Session.GetString("username");
+
+            if (string.IsNullOrEmpty(user))
+            {
+                TempData["Error"] = "You must be logged in to comment.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (!string.IsNullOrEmpty(content))
+            {
+                var comment = new Comment
+                {
+                    CommentID = Guid.NewGuid().ToString(),
+                    PostID = postId,
+                    UserID = user,
+                    Username = username,
+                    Content = content,
+                    DateCreated = DateTime.Now
+                };
+
+                await _commentInterface.AddAsync(comment);
+                await _commentInterface.SaveAsync();
+
+                TempData["CommentSuccess"] = "Comment added!";
+            }
+            else
+            {
+                TempData["Error"] = "Comment cannot be empty.";
+            }
+
+            return RedirectToAction("All", "Post");
+        }
     }
 }
+

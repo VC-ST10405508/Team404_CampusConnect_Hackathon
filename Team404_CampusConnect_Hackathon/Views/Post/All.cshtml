@@ -1,43 +1,72 @@
-﻿@model IEnumerable<Team404_CampusConnect_Hackathon.Models.Post>
+﻿@model IEnumerable<Team404_CampusConnect_Hackathon.Models.PostWithCommentsViewModel>
 
-<h2 class="text-primary mb-3">All Posts</h2>
+<h2 class="text-primary mb-3 text-center">All Posts</h2>
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">
-        @TempData["PostSuccess"]
-    </div>
+    <div class="alert alert-danger text-center">@TempData["Error"]</div>
 }
 
-<p>Want to respond to someone or share a post? Create a new one here:</p>
-<a asp-controller="Post" asp-action="NewPost" class="btn btn-primary mb-4">Create New Post</a>
+@if (TempData["CommentSuccess"] != null)
+{
+    <div class="alert alert-success text-center">@TempData["CommentSuccess"]</div>
+}
 
-<table class="table table-striped table-hover shadow-sm rounded">
-    <thead class="table-dark">
-    <tr>
-        <th>Title</th>
-        <th>Content</th>
-        <th>Category</th>
-        <th>Date Created</th>
-        <th>User</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var post in Model)
+<div class="text-center mb-4">
+    <a asp-controller="Post" asp-action="NewPost" class="btn btn-primary">Create New Post</a>
+</div>
+
+<!-- Flex container to center cards -->
+<div class="d-flex justify-content-center flex-wrap">
+    @foreach (var item in Model)
     {
-        <tr>
-            <td>@post.Title</td>
-            <td>@post.Content</td>
-            <td>@post.Category</td>
-            <td>@post.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
-            <td>@post.Username</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@post.PostID" class="btn btn-sm text-white" style="background-color:#4B6EF5;">View</a>
-                <a asp-action="Edit" asp-route-id="@post.PostID" class="btn btn-sm text-white" style="background-color:#2ECC71;">Edit</a>
-                <a asp-action="Delete" asp-route-id="@post.PostID" class="btn btn-sm text-white" style="background-color:#FF6B6B;">Delete</a>
-            </td>
-        </tr>
+        <div class="m-2" style="width: 350px;">
+            <div class="card shadow-sm h-100">
+                <!-- Card Header -->
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">@item.Post.Title</h5>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    <p class="card-text">@item.Post.Content</p>
+                    <span class="badge bg-secondary">@item.Post.Category</span>
+                </div>
+
+                <!-- Post Info -->
+                <div class="card-footer text-muted">
+                    <small>
+                        Posted on @item.Post.DateCreated.ToString("yyyy-MM-dd HH:mm") by <strong>@item.Post.Username</strong>
+                    </small>
+                </div>
+
+                <!-- Comment Form -->
+                <div class="card-footer">
+                    <form asp-controller="Post" asp-action="Add" method="post" class="d-flex mb-2">
+                        <input type="hidden" name="postId" value="@item.Post.PostID" />
+                        <input type="text" name="content" class="form-control me-2" placeholder="Write a comment..." required />
+                        <button type="submit" class="btn btn-sm btn-warning">Add Comment</button>
+                    </form>
+
+                    <!-- Display Comments -->
+                    @if (item.Comments.Any())
+                    {
+                        <div class="mt-2">
+                            <h6>Comments:</h6>
+                            <ul class="list-group list-group-flush">
+                                @foreach (var comment in item.Comments)
+                                {
+                                    <li class="list-group-item">
+                                        <strong>@comment.Username:</strong> @comment.Content
+                                        <br />
+                                        <small class="text-muted">@comment.DateCreated.ToString("yyyy-MM-dd HH:mm")</small>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     }
-    </tbody>
-</table>
+</div>
