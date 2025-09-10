@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using Team404_CampusConnect_Hackathon.Models;
@@ -26,9 +26,6 @@ namespace Team404_CampusConnect_Hackathon.Data
         public DbSet<GroupAnnouncement> GroupAnnouncements { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<StudyMaterial> StudyMaterials { get; set; }
-        public DbSet<MaterialEntry> MaterialEntries { get; set; }
-        public DbSet<StudyMaterialReport> StudyMaterialReports { get; set; }
-        public DbSet<Subject> Subjects { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
