@@ -12,7 +12,7 @@ This project was created as part of a hackathon, with the goal of rapidly develo
 - **Joshua Ponquett** – Main Backend Developer, Documentation Specialist, responsible for GitHub setup.
 
 ---
-##Technologies used:
+## Technologies used:
 
 - Visual studio
 - Entity Framework
