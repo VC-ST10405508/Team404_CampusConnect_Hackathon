@@ -1,9 +1,13 @@
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY . .
-RUN dotnet restore "./Team404_CampusConnect_Hackathon.csproj"
-RUN dotnet publish "./Team404_CampusConnect_Hackathon.csproj" -c Release -o /app
+
+# Copy project folder
+COPY Team404_CampusConnect_Hackathon/ ./Team404_CampusConnect_Hackathon/
+
+# Restore & publish using the correct path
+RUN dotnet restore "./Team404_CampusConnect_Hackathon/Team404_CampusConnect_Hackathon.csproj"
+RUN dotnet publish "./Team404_CampusConnect_Hackathon/Team404_CampusConnect_Hackathon.csproj" -c Release -o /app
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
