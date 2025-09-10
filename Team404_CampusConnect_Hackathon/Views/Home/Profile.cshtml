@@ -1,0 +1,39 @@
+@model Team404_CampusConnect_Hackathon.Models.User
+
+@{
+    ViewBag.Title = "Profile";
+    Layout = "_Layout";
+    var currentUser = Model; // use the model directly
+}
+
+<h2>Welcome back @currentUser.UserName</h2>
+
+<div style="max-width: 600px; margin: 20px auto; font-family: Arial, sans-serif; border: 1px solid #ccc; padding: 20px; border-radius: 10px; background-color: #f9f9f9;">
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img 
+            src="@currentUser.ProfilePhotoe"
+            alt="Profile Photo"
+            width="150"
+            height="150"
+            style="border-radius: 50%; border: 2px solid #ddd;"
+            onerror="this.onerror=null; this.src='https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2558760599.jpg';" />
+    </div>
+
+    <h3 style="text-align: center; color: #333;">Personal Details</h3>
+    <p><strong>User ID:</strong> @currentUser.UserID</p>
+    <p><strong>Username:</strong> @currentUser.UserName</p>
+    <p><strong>Email:</strong> @currentUser.Email</p>
+    <p><strong>Password:</strong> ****</p>
+    <p><strong>Skills:</strong> @currentUser.UserSkills</p>
+    <p><strong>Degree:</strong> @currentUser.Degree</p>
+    <p><strong>Date Account Created:</strong> @currentUser.Created</p>
+    <p><strong>Role:</strong> @currentUser.role</p>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="@Url.Action("EditProfile", "Home")"
+           style="padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">
+            Edit
+        </a>
+    </div>
+</div>

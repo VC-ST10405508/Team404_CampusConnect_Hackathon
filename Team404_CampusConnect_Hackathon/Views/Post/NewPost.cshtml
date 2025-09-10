@@ -1,0 +1,60 @@
+﻿@model Team404_CampusConnect_Hackathon.Models.Post
+<div class="col-md-6">
+    @if (ViewBag.errorMsg != null)
+    {
+        <div class="alert alert-danger">@ViewBag.errorMsg</div>
+    }
+    @if (ViewBag.successMsg != null)
+    {
+        <div class="alert alert-success">@ViewBag.successMsg</div>
+    }
+</div>
+
+<div class="container my-5">
+    <div class="card shadow-sm rounded" style="background-color:#E9ECF5; border:none; padding:20px;">
+        <div class="card-body">
+            <h2 class="text-primary mb-4">Create a New Post</h2>
+
+            <div class="col-md-6 mb-3">
+                @if (ViewBag.errorMsg != null)
+                {
+                    <div class="alert" style="background-color:#FF6B6B; color:white; border-radius:0.5rem;">
+                        @ViewBag.errorMsg
+                    </div>
+                }
+                @if (ViewBag.successMsg != null)
+                {
+                    <div class="alert" style="background-color:#2ECC71; color:white; border-radius:0.5rem;">
+                        @ViewBag.successMsg
+                    </div>
+                }
+            </div>
+
+            <form asp-action="NewPost" method="post">
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Content" class="form-label"></label>
+                    <textarea asp-for="Content" class="form-control"></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Category" class="form-label"></label>
+                    <select asp-for="Category" class="form-control" id="categorySelect">
+                        <option value="Question">Question</option>
+                        <option value="Idea">Idea</option>
+                        <option value="Tip">Tip</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Create Post</button>
+            </form>
+        </div>
+    </div>
+</div>

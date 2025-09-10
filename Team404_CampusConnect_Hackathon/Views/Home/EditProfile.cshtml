@@ -1,0 +1,58 @@
+@model Team404_CampusConnect_Hackathon.Models.User
+@{
+    ViewBag.Title = "Edit Profile";
+    Layout = "_Layout";
+    var currentUser = Model; // single user
+}
+
+<h2>Edit Profile - @currentUser.UserName</h2>
+
+<body>
+    <form method="post">
+        <div style="max-width: 600px; margin: 20px auto; font-family: Arial, sans-serif; border: 1px solid #ccc; padding: 20px; border-radius: 10px; background-color: #f9f9f9;">
+  
+            <!-- Profile Picture Section -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <img 
+                    id="profileImage"
+                    src="" 
+                    alt="Profile Photo" 
+                    width="150" 
+                    height="150"
+                    style="border-radius: 50%; border: 2px solid #ddd; cursor: pointer;"
+                    onclick="document.getElementById('profileFileInput').click();"
+                    onerror="this.onerror=null; this.src='https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2558760599.jpg';"
+                />
+            </div>
+
+            <!-- Personal Details Section -->
+            <div>
+                <h3 style="text-align: center; color: #333;">Personal Details</h3>
+
+                <label><strong>User ID:</strong></label>
+                <input type="text" name="UserID" value="@currentUser.UserID" readonly style="width:100%; margin-bottom:10px; padding:5px;" />
+
+                <label><strong>Username:</strong></label>
+                <input type="text" name="UserName" value="@currentUser.UserName" style="width:100%; margin-bottom:10px; padding:5px;" />
+
+                <label><strong>Email:</strong></label>
+                <input type="email" name="Email" value="@currentUser.Email" style="width:100%; margin-bottom:10px; padding:5px;" />
+
+                <label><strong>Password:</strong></label>
+                <input type="password" name="Password" value="****" readonly style="width:100%; margin-bottom:10px; padding:5px;" />
+
+                <label><strong>Skills:</strong></label>
+                <input type="text" name="UserSkills" value="@currentUser.UserSkills" style="width:100%; margin-bottom:10px; padding:5px;" />
+=
+                <label><strong>Degree:</strong></label>
+                <input type="text" name="Degree" value="@currentUser.Degree" style="width:100%; margin-bottom:10px; padding:5px;" />
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit" style="padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</body>

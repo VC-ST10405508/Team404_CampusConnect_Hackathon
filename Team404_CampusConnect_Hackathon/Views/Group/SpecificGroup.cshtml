@@ -1,0 +1,123 @@
+﻿@model Team404_CampusConnect_Hackathon.Models.Group
+
+@{
+    ViewData["Title"] = Model.GroupName;
+    var currentUserId = Context.Session.GetString("uID"); 
+    bool isMember = Model.UserGroups.Any(ug => ug.UserID == currentUserId);
+}
+
+<div class="container my-5">
+    <div class="card shadow-lg rounded" style="background-color:#E9ECF5; border:none; padding:30px;">
+        <div class="card-body">
+            <h2 class="text-primary mb-2 text-center">@Model.GroupName</h2>
+            <p class="text-center mb-4">@Model.Description</p>
+
+            @if (!isMember)
+            {
+                <form asp-action="JoinGroup" asp-controller="Group" method="post" class="text-center mb-4">
+                    <input type="hidden" name="GroupID" value="@Model.GroupID" />
+                    <button type="submit" class="btn btn-success">Join Group</button>
+                </form>
+            }
+
+            @if (isMember)
+            {
+                <ul class="nav nav-tabs justify-content-center" id="groupTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat" type="button" role="tab">Chat</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="members-tab" data-bs-toggle="tab" data-bs-target="#members" type="button" role="tab">Members</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="announcements-tab" data-bs-toggle="tab" data-bs-target="#announcements" type="button" role="tab">Announcements</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab">Events</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-4" id="groupTabsContent">
+                    <div class="tab-pane fade show active" id="chat" role="tabpanel">
+                        <h4 class="text-primary mb-3">Group Chat</h4>
+                        <div id="chatMessages" class="mb-3" style="max-height:300px; overflow-y:auto; padding:10px; background-color:#ffffff; border-radius:0.5rem; border:1px solid #ccc;">
+                            @foreach (var msg in Model.GroupChatMessages ?? new List<Team404_CampusConnect_Hackathon.Models.GroupChatMessage>())
+                            {
+                                <div class="mb-2">
+                                    <strong>@msg.User?.UserName</strong>: @msg.Content <br />
+                                    <small class="text-muted">@msg.DateSent</small>
+                                </div>
+                            }
+                        </div>
+                        <form asp-action="SendMessage" asp-controller="Group" method="post">
+                            <input type="hidden" name="GroupID" value="@Model.GroupID" />
+                            <div class="input-group mb-3">
+                                <input type="text" name="Content" class="form-control" placeholder="Type a message..." />
+                                <button type="submit" class="btn btn-primary">Send</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane fade" id="members" role="tabpanel">
+                        <h4 class="text-primary mb-3">Members</h4>
+                        <ul class="list-group">
+                            @foreach (var member in Model.UserGroups ?? new List<Team404_CampusConnect_Hackathon.Models.UserGroup>())
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @member.User.UserName
+                                    <span class="badge bg-success">@member.Role</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="announcements" role="tabpanel">
+                        <h4 class="text-primary mb-3">Announcements</h4>
+                        @if (Model.Announcements.Any())
+                        {
+                            <ul class="list-group">
+                                @foreach (var announcement in Model.Announcements)
+                                {
+                                    <li class="list-group-item">
+                                        <strong>@announcement.Title</strong> - @announcement.Content
+                                        <br />
+                                        <small class="text-muted">@announcement.DateCreated</small>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No announcements yet.</p>
+                        }
+                    </div>
+
+                    <div class="tab-pane fade" id="events" role="tabpanel">
+                        <h4 class="text-primary mb-3">Events</h4>
+                        @if (Model.Events.Any())
+                        {
+                            <ul class="list-group">
+                                @foreach (var evt in Model.Events)
+                                {
+                                    <li class="list-group-item">
+                                        <strong>@evt.Title</strong> - @evt.Description
+                                        <br />
+                                        <small class="text-muted">Date: @evt.EventDate | Join Deadline: @evt.JoinDeadline</small>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No events created yet.</p>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted text-center mt-3">You must join this group to see chat, members, announcements, and events.</p>
+            }
+        </div>
+    </div>
+</div>
