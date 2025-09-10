@@ -1,0 +1,25 @@
+@model IEnumerable<Team404_CampusConnect_Hackathon.Models.StudyMaterial>
+
+@{
+    ViewData["Title"] = "Study Materials";
+}
+
+<h2>Study Materials</h2>
+
+<a class="btn btn-primary mb-3" href="@Url.Action("CreateMaterial", "Home")">Create New Material</a>
+
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    @foreach(var item in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">@item.Name</h5>
+                <p class="card-text">@item.Description</p>
+                
+                <a href="@item.FilePath" download class="btn btn-sm btn-outline-secondary">
+                    Download File
+                </a>
+            </div>
+        </div>
+    }
+</div>
