@@ -59,6 +59,8 @@ This project was created as part of a hackathon, with the goal of rapidly develo
 ---
 
 ## Getting Started
-1. Clone the repository:
-```bash
-git clone https://github.com/VC-ST10405508/Team404_CampusConnect_Hackathon.git
+- 1: It would be easiest if you have visual studio instealled. Please install visual studio then move onto the next step
+- 2: Open visual studio and click on the clone repository section
+- 3: paste this URL into the repository Location: https://github.com/VC-ST10405508/Team404_CampusConnect_Hackathon.git 
+- 4: Click clone
+- 5: the project should be installed locally on your device shortly. press the run button and enjoy :D
