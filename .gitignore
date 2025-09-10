@@ -1,10 +1,17 @@
-# Visual Studio user-specific and cache files
-.vs/
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
+# Ignore build/output folders
+/bin/
+/obj/
 
-# Build output
-bin/
-obj/	
+# Ignore database files
+*.db
+
+# Ignore IDE/editor config files
+/.idea/
+/.vscode/
+
+# Ignore binaries, caches, logs, etc.
+*.dll
+*.pdb
+*.cache
+*.exe
+*.user
